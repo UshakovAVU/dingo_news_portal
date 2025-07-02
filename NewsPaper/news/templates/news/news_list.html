@@ -3,6 +3,12 @@
 
 {% block content %}
 <h1>Список новостей</h1>
+
+<form method="GET">
+    {{ filter.form.as_p }}
+    <button type="submit">Поиск</button>
+</form>
+
 <ul>
     {% for news in news_list %}
     <li>
@@ -13,4 +19,23 @@
     </li>
     {% endfor %}
 </ul>
+
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; первая</a>
+            <a href="?page={{ page_obj.previous_page_number }}">Предыдущая</a>
+        {% endif %}
+
+        <span class="current">
+            Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">Следующая</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">последняя &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+
 {% endblock %}

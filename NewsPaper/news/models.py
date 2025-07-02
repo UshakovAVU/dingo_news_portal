@@ -23,7 +23,6 @@ class Author(models.Model):
             postCommentRating=Sum('rating'))
 
         comment_rating = (commentR.get('commentRating') or 0) + (comments_from_posts.get('postCommentRating') or 0)
-
         self.ratingAuthor = post_rating + comment_rating
         self.save()
 
@@ -51,6 +50,7 @@ class Post(models.Model):
         return f"{self.title} by {self.author.authorUser.username}"
 
 class News(models.Model):
+    """ Модель News для новостных статей. """
     title = models.CharField(max_length=255)
     text = models.TextField()
     date = models.DateTimeField(auto_now_add=True)

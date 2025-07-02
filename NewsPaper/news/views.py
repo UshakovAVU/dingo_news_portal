@@ -1,9 +1,10 @@
 # news/views.py
 from django.http import HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404
-from django.views.generic import ListView, DetailView
-from django.views.generic.base import View
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, View
 from .models import Author, Post, News
+from .filters import NewsFilter  # Импортируем свой фильтр
+from django.urls import reverse_lazy
 
 # Список плохих слов для цензурирования
 bad_names = ['incidents', 'Дурак', 'Гад']
@@ -22,8 +23,35 @@ class AuthorsPage(ListView):
 
 class PostDetail(View):
     def get(self, request, pk):
-        ps = Post.objects.get(id=pk)
+        ps = get_object_or_404(Post, id=pk)
         return render(request, "news/posts.html", {'ps': ps})
+
+class NewsListView(ListView):
+    model = News
+    template_name = 'news/news_list.html'
+    context_object_name = 'news_list'
+    paginate_by = 10  # Количество новостей на странице
+
+    def get_queryset(self):
+        self.filterset = NewsFilter(self.request.GET, queryset=super().get_queryset())
+        return self.filterset.qs
+
+class NewsCreate(CreateView):
+    model = News
+    fields = ['title', 'text']  # Укажите поля, которые нужно заполнить
+    template_name = 'news/news_form.html'
+    success_url = reverse_lazy('news_list')
+
+class NewsUpdate(UpdateView):
+    model = News
+    fields = ['title', 'text']  # Укажите поля для редактирования
+    template_name = 'news/news_form.html'
+    success_url = reverse_lazy('news_list')
+
+class NewsDelete(DeleteView):
+    model = News
+    template_name = 'news/news_confirm_delete.html'
+    success_url = reverse_lazy('news_list')
 
 def news_page_list(request):
     """ Представление для вывода страницы с новостями по заданию 6.1 """
@@ -37,11 +65,11 @@ def news_list(request):
     news_list = News.objects.all().order_by('-date')
     for news in news_list:
         news.title = censor(news.title)  # Цензурируем заголовок
-        news.content = censor(news.content[:20])  # Показываем только 20 символов
+        news.text = censor(news.text[:20])  # Показываем только 20 символов
     return render(request, 'news/news_list.html', {'news_list': news_list})
 
 def news_detail(request, news_id):
     news = get_object_or_404(News, id=news_id)
     news.title = censor(news.title)
-    news.content = censor(news.content)  # Цензурируем полный текст
+    news.text = censor(news.text)  # Цензурируем полный текст
     return render(request, 'news/news_detail.html', {'news': news})
