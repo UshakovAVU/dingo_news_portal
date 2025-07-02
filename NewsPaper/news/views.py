@@ -42,6 +42,11 @@ class NewsCreate(CreateView):
     template_name = 'news/news_form.html'
     success_url = reverse_lazy('news_list')
 
+    def form_valid(self, form):
+        news = form.save(commit=False)
+        news.type = 'news'  # Установка типа
+        return super().form_valid(form)
+
 class NewsUpdate(UpdateView):
     model = News
     fields = ['title', 'text']  # Укажите поля для редактирования
@@ -49,6 +54,29 @@ class NewsUpdate(UpdateView):
     success_url = reverse_lazy('news_list')
 
 class NewsDelete(DeleteView):
+    model = News
+    template_name = 'news/news_confirm_delete.html'
+    success_url = reverse_lazy('news_list')
+
+# Новые классы для создания, редактирования и удаления статей
+class ArticleCreate(CreateView):
+    model = News  # Используем ту же модель, что и для новостей
+    fields = ['title', 'text']
+    template_name = 'news/news_form.html'
+    success_url = reverse_lazy('news_list')
+
+    def form_valid(self, form):
+        article = form.save(commit=False)
+        article.type = 'article'  # Устанавливаем тип как 'статья'
+        return super().form_valid(article)
+
+class ArticleUpdate(UpdateView):
+    model = News
+    fields = ['title', 'text']
+    template_name = 'news/news_form.html'
+    success_url = reverse_lazy('news_list')
+
+class ArticleDelete(DeleteView):
     model = News
     template_name = 'news/news_confirm_delete.html'
     success_url = reverse_lazy('news_list')

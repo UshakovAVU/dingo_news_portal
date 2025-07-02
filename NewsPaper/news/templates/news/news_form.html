@@ -1,5 +1,26 @@
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Сохранить</button>
-</form>
+<!-- news/templates/news/news_form.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Создать/Редактировать Новости</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}"> <!-- Подключение файла стилей (если есть) -->
+</head>
+<body>
+    <h1>{% if object %}Редактировать{% else %}Создать{% endif %} Новости/Статью</h1>
+
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            <strong>Ошибка!</strong> Проверьте данные в форме.
+        </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Сохранить</button>
+    </form>
+
+    <a href="{% url 'news_list' %}">Вернуться к списку новостей</a>
+</body>
+</html>

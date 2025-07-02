@@ -1,6 +1,19 @@
-<form method="post">
-    {% csrf_token %}
-    <p>Вы уверены, что хотите удалить "{{ object.title }}"?</p>
-    <button type="submit">Да</button>
-    <a href="{% url 'news_list' %}">Отмена</a>
-</form>
+<!-- news/templates/news/news_confirm_delete.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Подтверждение удаления</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}"> <!-- Подключение файла стилей (если есть) -->
+</head>
+<body>
+    <h1>Подтверждение удаления</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        <p>Вы уверены, что хотите удалить "{{ object.title }}"?</p>
+        <button type="submit">Да, удалить</button>
+        <a href="{% url 'news_list' %}">Отмена</a>
+    </form>
+</body>
+</html>
