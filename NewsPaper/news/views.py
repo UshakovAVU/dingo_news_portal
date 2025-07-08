@@ -1,7 +1,7 @@
-# news/views.py
 from django.http import HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, View
+from django.contrib.auth.mixins import LoginRequiredMixin  # Импортируем миксин для проверки аутентификации
 from .models import Author, Post, News
 from .filters import NewsFilter  # Импортируем свой фильтр
 from django.urls import reverse_lazy
@@ -36,7 +36,7 @@ class NewsListView(ListView):
         self.filterset = NewsFilter(self.request.GET, queryset=super().get_queryset())
         return self.filterset.qs
 
-class NewsCreate(CreateView):
+class NewsCreate(LoginRequiredMixin, CreateView):
     model = News
     fields = ['title', 'text']  # Укажите поля, которые нужно заполнить
     template_name = 'news/news_form.html'
@@ -45,21 +45,21 @@ class NewsCreate(CreateView):
     def form_valid(self, form):
         news = form.save(commit=False)
         news.type = 'news'  # Установка типа
-        return super().form_valid(form)
+        return super().form_valid(news)
 
-class NewsUpdate(UpdateView):
+class NewsUpdate(LoginRequiredMixin, UpdateView):
     model = News
     fields = ['title', 'text']  # Укажите поля для редактирования
     template_name = 'news/news_form.html'
     success_url = reverse_lazy('news_list')
 
-class NewsDelete(DeleteView):
+class NewsDelete(LoginRequiredMixin, DeleteView):
     model = News
     template_name = 'news/news_confirm_delete.html'
     success_url = reverse_lazy('news_list')
 
 # Новые классы для создания, редактирования и удаления статей
-class ArticleCreate(CreateView):
+class ArticleCreate(LoginRequiredMixin, CreateView):
     model = News  # Используем ту же модель, что и для новостей
     fields = ['title', 'text']
     template_name = 'news/news_form.html'
@@ -70,13 +70,13 @@ class ArticleCreate(CreateView):
         article.type = 'article'  # Устанавливаем тип как 'статья'
         return super().form_valid(article)
 
-class ArticleUpdate(UpdateView):
+class ArticleUpdate(LoginRequiredMixin, UpdateView):
     model = News
     fields = ['title', 'text']
     template_name = 'news/news_form.html'
     success_url = reverse_lazy('news_list')
 
-class ArticleDelete(DeleteView):
+class ArticleDelete(LoginRequiredMixin, DeleteView):
     model = News
     template_name = 'news/news_confirm_delete.html'
     success_url = reverse_lazy('news_list')
